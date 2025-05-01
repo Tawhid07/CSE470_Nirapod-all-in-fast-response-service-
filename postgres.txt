@@ -61,3 +61,7 @@ mvn clean install
 mvn spring-boot:run
 
 # 16. Press Q to exit from the psql prompt
+
+project name 
+
+CSE470_Nirapod-all-in-fast-response-service-
