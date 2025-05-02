@@ -36,11 +36,18 @@
    ```bash
    npm install
    ```
-3. Start the frontend:
+3. Install Map dependencies:
+   ```bash
+   npm install leaflet
+
+   npm install leaflet-control-geocoder
+   ```
+
+4. Start the frontend:
    ```bash
    npm start
    ```
-4. The frontend will run on `http://localhost:3000` by default.
+5. The frontend will run on `http://localhost:3000` by default.
 
 ---
 
