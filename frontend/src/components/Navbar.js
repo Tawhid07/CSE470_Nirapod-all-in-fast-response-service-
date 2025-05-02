@@ -77,7 +77,7 @@ function Navbar() {
         <div className="navbar-btn-group">
           <a href="/home" className="navbar-btn">Home</a>
           <a href="/complains" className="navbar-btn">Complains</a>
-          <a href="/investigate" className="navbar-btn">Investigate</a>
+          {/* <a href=# className="navbar-btn"></a> */}
           <div className="navbar-profile-dropdown" ref={dropdownRef}>
             <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
               Profile <span style={{marginLeft: 6}}>▼</span>

@@ -115,6 +115,30 @@
   color: #fff;
 }
 
+.complain-gps-btn {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  margin-left: auto;
+}
+
+.complain-gps-btn:hover {
+  background: #9ACBD0;
+  transform: scale(1.05);
+}
+
+
+
+.complain-gps-btn:active {
+  transform: scale(0.95);
+}
+
 @media (max-width: 700px) {
   .complain-form {
     max-width: 98vw;

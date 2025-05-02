@@ -155,7 +155,37 @@ function Complain() {
         </div>
         <div className="complain-row">
           <label>Location :</label>
-          <input className="complain-input" name="location" value={form.location} onChange={handleChange} placeholder="Full address" required />
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <input
+              className="complain-input"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Full address"
+              required
+            />
+            <button
+              type="button"
+              className="complain-gps-btn"
+              onClick={async () => {
+                if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                      const { latitude, longitude } = position.coords;
+                      setForm((f) => ({ ...f, location: `${latitude},${longitude}` }));
+                    },
+                    (error) => {
+                      alert('Failed to get location. Please enable GPS.');
+                    }
+                  );
+                } else {
+                  alert('Geolocation is not supported by this browser.');
+                }
+              }}
+            >
+              Get Location
+            </button>
+          </div>
         </div>
         <div className="complain-row">
           <label>Tag :</label>
@@ -171,8 +201,13 @@ function Complain() {
             {form.photos && form.photos.length > 0 ? `${form.photos.length} photo${form.photos.length > 1 ? 's' : ''} added` : 'Add photos'}
             <input type="file" name="photos" style={{ display: 'none' }} onChange={handleChange} multiple />
           </label>
-          <label className="complain-radio-label">
-            <input type="radio" name="postOnTimeline" checked={form.postOnTimeline} onChange={handleChange} />
+          <label className="complain-checkbox-label">
+            <input
+              type="checkbox"
+              name="postOnTimeline"
+              checked={form.postOnTimeline}
+              onChange={handleChange}
+            />
             Post it on timeline
           </label>
           {photoError && <div style={{color:'#ef4444', marginTop:8, fontWeight:500}}>{photoError}</div>}

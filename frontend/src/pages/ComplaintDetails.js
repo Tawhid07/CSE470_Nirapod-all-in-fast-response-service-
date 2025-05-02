@@ -97,7 +97,7 @@ function ComplaintDetails() {
           <span className="detail-value">{complaint.area}</span>
         </div>
         <div className="detail-row">
-          <span className="detail-label">Location :</span>
+          <span className="detail-label">Location : </span>
           <span className="detail-value">{complaint.location}</span>
         </div>
         <div className="detail-row">
