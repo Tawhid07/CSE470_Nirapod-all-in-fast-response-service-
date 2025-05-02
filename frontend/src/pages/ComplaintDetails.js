@@ -5,6 +5,8 @@ import ComplaintService from './ComplaintService';
 import UpdateComplaint from './UpdateComplaint';
 import './ComplaintDetails.css';
 import axios from 'axios';
+import L from 'leaflet';
+import 'leaflet-control-geocoder';
 
 function ComplaintDetails() {
   const { id } = useParams();
@@ -47,6 +49,44 @@ function ComplaintDetails() {
   const handleBackToList = () => {
     navigate('/complains');
   };
+
+  useEffect(() => {
+    const location = complaint?.location;
+    if (!location) return;
+
+    const [latitude, longitude] = location.split(',').map(coord => parseFloat(coord.trim()));
+
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      const map = L.map('map').setView([latitude, longitude], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker([latitude, longitude]).addTo(map)
+        .bindPopup('The problem was reported here').openPopup();
+    } else {
+      const map = L.map('map').setView([0, 0], 2);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const geocoder = L.Control.Geocoder.nominatim();
+      geocoder.geocode(location, (results) => {
+        if (results.length > 0) {
+          const { center } = results[0];
+          map.setView(center, 13);
+          L.marker(center).addTo(map)
+            .bindPopup(location).openPopup();
+        } else {
+          document.getElementById('map').innerHTML = 'Location not found in the map';
+        }
+      });
+    }
+  }, [complaint?.location]);
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -99,6 +139,27 @@ function ComplaintDetails() {
         <div className="detail-row">
           <span className="detail-label">Location : </span>
           <span className="detail-value">{complaint.location}</span>
+        </div>
+
+        <div className="detail-row">
+          <span className="detail-label">Map :</span>
+          <div className="detail-value" style={{ height: '300px', width: '100%', border: '1px solid #ccc', borderRadius: '8px' }}>
+            {(() => {
+              const location = complaint.location;
+              if (!location) return <div>Location not found in the map</div>;
+
+              const [latitude, longitude] = location.split(',').map(coord => parseFloat(coord.trim()));
+
+              if (!isNaN(latitude) && !isNaN(longitude)) {
+                return (
+                  <div id="map" style={{ height: '100%', width: '100%' }}></div>
+                );
+              } else {
+                return <div>Searching for location...</div>;
+              }
+            })()}
+          </div>
+
         </div>
         <div className="detail-row">
           <span className="detail-label">Timestamp :</span>
