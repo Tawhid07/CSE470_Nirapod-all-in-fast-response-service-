@@ -99,6 +99,17 @@
   color: #fff;
 }
 
+.navbar-welcome-msg {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Fira Mono', monospace;
+}
+
 .police-navbar {
   composes: navbar-custom;
   background: #1a237e !important; /* Police blue */
