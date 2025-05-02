@@ -53,6 +53,9 @@ DROP TABLE "User";
 # 15. Frontend
 cd frontend
 npm install
+npm install leaflet
+npm install leaflet-control-geocoder
+
 npm start
 
 # 16. Backend
@@ -74,4 +77,3 @@ DELETE FROM "usr_complain" WHERE "nid" = '1111111111';
 
 -- Now delete the user
 DELETE FROM "usr_user" WHERE "nid" = '1111111111';
-test 
