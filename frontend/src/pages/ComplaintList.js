@@ -1,5 +1,5 @@
 // src/components/ComplaintList.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ComplaintService from './ComplaintService';
 import './ComplaintList.css';
@@ -9,11 +9,31 @@ const ComplaintList = () => {
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({ tags: '', urgency: '', complainTo: '' });
+    const [filterOpen, setFilterOpen] = useState(false);
+    const filterBtnRef = useRef(null);
+    const filterDropdownRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchComplaints();
     }, []);
+
+    useEffect(() => {
+        if (!filterOpen) return;
+        function handleClickOutside(event) {
+            if (
+                filterDropdownRef.current &&
+                !filterDropdownRef.current.contains(event.target) &&
+                filterBtnRef.current &&
+                !filterBtnRef.current.contains(event.target)
+            ) {
+                setFilterOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [filterOpen]);
 
     const fetchComplaints = async () => {
         try {
@@ -37,17 +57,94 @@ const ComplaintList = () => {
         return 'status-unsolved';
     };
 
+    const handleFilterChange = (e) => {
+        setFilters({ ...filters, [e.target.name]: e.target.value });
+    };
+
+    const filteredComplaints = complaints.filter((complaint) => {
+        return (
+            (!filters.tags || complaint.tags.toLowerCase().includes(filters.tags.toLowerCase())) &&
+            (!filters.urgency || complaint.urgency.toLowerCase() === filters.urgency.toLowerCase()) &&
+            (!filters.complainTo || complaint.complainTo.toLowerCase().includes(filters.complainTo.toLowerCase()))
+        );
+    });
+
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">{error}</div>;
 
     return (
         <div className="complaint-list-container">
-            {complaints.map((complaint) => {
+            <div style={{ padding: '12px 0 0 0', display: 'flex', justifyContent: 'flex-start', marginLeft: 438 }}>
+                <div style={{ background: '#232b36', borderRadius: 18, padding: 12, marginBottom: 12, display: 'flex', gap: 18, alignItems: 'center', position: 'relative' }}>
+                    <button
+                        ref={filterBtnRef}
+                        style={{ borderRadius: 8, padding: '8px 32px', fontSize: 16, border: 'none', background: '#e5e7eb', fontWeight: 600, cursor: 'pointer' }}
+                        onClick={() => setFilterOpen(o => !o)}
+                    >
+                        Filter
+                    </button>
+                    {filterOpen && (
+                        <div ref={filterDropdownRef} style={{ position: 'absolute', top: 48, left: 0, background: '#fff', borderRadius: 12, boxShadow: '0 4px 24px #0003', padding: 32, zIndex: 10, minWidth: 380, maxWidth: 480, width: 100, boxSizing: 'border-box', overflow: 'hidden', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={{ fontWeight: 500 }}>Tags:</label>
+                                <input
+                                    type="text"
+                                    name="tags"
+                                    value={filters.tags}
+                                    onChange={handleFilterChange}
+                                    placeholder="Filter by tags"
+                                    style={{ borderRadius: 8, padding: '10px 18px', fontSize: 16, border: '1px solid #ddd', width: '100%', marginTop: 4, boxSizing: 'border-box', overflow: 'hidden' }}
+                                />
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={{ fontWeight: 500 }}>Urgency:</label>
+                                <select
+                                    name="urgency"
+                                    value={filters.urgency}
+                                    onChange={handleFilterChange}
+                                    style={{ borderRadius: 8, padding: '10px 18px', fontSize: 16, border: '1px solid #ddd', width: '100%', marginTop: 4, boxSizing: 'border-box', overflow: 'hidden' }}
+                                >
+                                    <option value="">All</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <label style={{ fontWeight: 500 }}>Complain To:</label>
+                                <input
+                                    type="text"
+                                    name="complainTo"
+                                    value={filters.complainTo}
+                                    onChange={handleFilterChange}
+                                    placeholder="Filter by complainTo"
+                                    style={{ borderRadius: 8, padding: '10px 18px', fontSize: 16, border: '1px solid #ddd', width: '100%', marginTop: 4, boxSizing: 'border-box', overflow: 'hidden' }}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                                <button
+                                    type="button"
+                                    style={{ borderRadius: 8, padding: '10px 32px', fontSize: 16, border: 'none', background: '#2563eb', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+                                    onClick={() => setFilterOpen(false)}
+                                >
+                                    Apply
+                                </button>
+                                <button
+                                    type="button"
+                                    style={{ borderRadius: 8, padding: '10px 32px', fontSize: 16, border: 'none', background: '#eee', fontWeight: 600, cursor: 'pointer' }}
+                                    onClick={() => { setFilters({ tags: '', urgency: '', complainTo: '' }); setFilterOpen(false); }}
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+            {filteredComplaints.map((complaint) => {
                 console.log('Complaint object:', complaint); // Debug: check structure
-                // Ensure we use the correct time from backend
                 const displayTime = (() => {
                     if (!complaint.time) return 'N/A';
-                    // If time is already a valid ISO string, parse it
                     if (typeof complaint.time === 'string' && complaint.time.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
                         let iso = complaint.time;
                         if (iso.includes('.')) iso = iso.split('.')[0];
@@ -55,7 +152,6 @@ const ComplaintList = () => {
                         const d = new Date(iso);
                         return isNaN(d) ? complaint.time : d.toLocaleString();
                     }
-                    // Otherwise, just show the raw value
                     return complaint.time;
                 })();
                 return (
@@ -80,7 +176,7 @@ const ComplaintList = () => {
                                 <span className="value">{displayTime}</span>
                             </div>
                             <div>
-                                <span className="label">Tag : </span>
+                                <span className="label">Tag  : </span>
                                 <span className="value">{complaint.tags}</span>
                             </div>
                             <div>
@@ -121,7 +217,6 @@ export const UserComplaintList = () => {
                 setLoading(false);
                 return;
             }
-            // Fetch user info to get NID
             const userRes = await axios.get(`/api/user/by-identifier?value=${encodeURIComponent(identifier)}`);
             const nid = userRes.data.nid;
             if (!nid) {
@@ -191,7 +286,6 @@ export const UserComplaintList = () => {
                                 <span className="value">{complaint.urgency}</span>
                             </div>
                         </div>
-                        {/* No details button for normal users */}
                     </div>
                 );
             })}
