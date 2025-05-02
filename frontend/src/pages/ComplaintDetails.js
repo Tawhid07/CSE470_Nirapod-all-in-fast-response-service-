@@ -7,6 +7,7 @@ import './ComplaintDetails.css';
 import axios from 'axios';
 import L from 'leaflet';
 import 'leaflet-control-geocoder';
+import pinGif from '../image/pin.gif';
 
 function ComplaintDetails() {
   const { id } = useParams();
@@ -64,7 +65,14 @@ function ComplaintDetails() {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map);
 
-      L.marker([latitude, longitude]).addTo(map)
+      const customIcon = L.icon({
+        iconUrl: pinGif, // Use the custom pin.gif
+        iconSize: [50, 50], // Size of the icon
+        iconAnchor: [25, 50], // Anchor point of the icon
+        popupAnchor: [0, -50] // Position of the popup relative to the icon
+      });
+
+      L.marker([latitude, longitude], { icon: customIcon }).addTo(map)
         .bindPopup('The problem was reported here').openPopup();
     } else {
       const map = L.map('map').setView([0, 0], 2);

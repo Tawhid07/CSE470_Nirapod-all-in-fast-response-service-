@@ -98,6 +98,7 @@
     background-color: #e0e0e0;
     color: #1c1e25;
 }
+
 .status-badge {
     display: inline-block;
     padding: 0.4rem 1rem;
@@ -118,4 +119,24 @@
 .status-inprogress {
     background-color: #ffeb3b;
     color: #333;
+}
+
+.map-container {
+    position: relative;
+    z-index: 0;
+}
+
+.pin-gif {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.custom-map-marker {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    object-fit: cover;
 }

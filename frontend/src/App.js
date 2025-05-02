@@ -16,6 +16,7 @@ import ComplaintDetails from './pages/ComplaintDetails';
 import Investigate from './pages/Investigate';
 import Profile from './pages/Profile';
 
+
 function App() {
   const location = useLocation();
 
