@@ -74,3 +74,4 @@ DELETE FROM "usr_complain" WHERE "nid" = '1111111111';
 
 -- Now delete the user
 DELETE FROM "usr_user" WHERE "nid" = '1111111111';
+test 
