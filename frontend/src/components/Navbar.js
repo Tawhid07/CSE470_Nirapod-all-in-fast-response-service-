@@ -64,7 +64,7 @@ function Navbar() {
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome Officer, {userName}</div>
       </nav>
     );
     
@@ -95,7 +95,7 @@ function Navbar() {
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome Fire-Fighter, {userName}</div>
       </nav>
     );
   } 
@@ -123,7 +123,7 @@ function Navbar() {
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome Animal-Rescuer, {userName}</div>
       </nav>
     );
   }
@@ -157,7 +157,7 @@ function Navbar() {
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome Govt City Officer, {userName}</div>
       </nav>
     );
   }
