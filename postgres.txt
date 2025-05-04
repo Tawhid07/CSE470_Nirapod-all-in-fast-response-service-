@@ -73,7 +73,7 @@ CSE470_Nirapod-all-in-fast-response-service-
 
 
 -- Delete related rows in usr_complain
-DELETE FROM "usr_complain" WHERE "nid" = '3322112233';
+DELETE FROM "usr_complain" WHERE "nid" = '"1111111111"';
 
 -- Now delete the user
 DELETE FROM "usr_user" WHERE "nid" = '1111111111';
