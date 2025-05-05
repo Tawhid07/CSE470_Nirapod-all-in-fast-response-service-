@@ -55,6 +55,12 @@ function ComplaintDetails() {
     const location = complaint?.location;
     if (!location) return;
 
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+      console.error('Map container not found. Ensure the DOM element is rendered before initializing the map.');
+      return;
+    }
+
     const [latitude, longitude] = location.split(',').map(coord => parseFloat(coord.trim()));
 
     if (!isNaN(latitude) && !isNaN(longitude)) {
@@ -75,24 +81,7 @@ function ComplaintDetails() {
       L.marker([latitude, longitude], { icon: customIcon }).addTo(map)
         .bindPopup('The problem was reported here').openPopup();
     } else {
-      const map = L.map('map').setView([0, 0], 2);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
-
-      const geocoder = L.Control.Geocoder.nominatim();
-      geocoder.geocode(location, (results) => {
-        if (results.length > 0) {
-          const { center } = results[0];
-          map.setView(center, 13);
-          L.marker(center).addTo(map)
-            .bindPopup(location).openPopup();
-        } else {
-          document.getElementById('map').innerHTML = 'Location not found in the map';
-        }
-      });
+      console.error('Invalid location data format. Map will not load.');
     }
   }, [complaint?.location]);
 
@@ -163,7 +152,7 @@ function ComplaintDetails() {
                   <div id="map" style={{ height: '100%', width: '100%' }}></div>
                 );
               } else {
-                return <div>Searching for location...</div>;
+                return <div>Please Use GPS Coordinates to load the map correctly !</div>;
               }
             })()}
           </div>
