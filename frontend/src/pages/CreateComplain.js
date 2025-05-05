@@ -128,10 +128,10 @@ function Complain() {
           <label>Complain to :</label>
           <select className="complain-input" name="complainTo" value={form.complainTo} onChange={handleChange} required>
             <option value="">Select</option>
-            <option value="Police">Police</option>
-            <option value="Fire Service">Fire Service</option>
-            <option value="City Corporation">City Corporation</option>
-            <option value="Animal Welfare">Animal Welfare</option>
+            <option value="police">Police</option>
+            <option value="fire">Fire Service</option>
+            <option value="city">City Corporation</option>
+            <option value="animal">Animal Welfare</option>
           </select>
         </div>
         <div className="complain-row">

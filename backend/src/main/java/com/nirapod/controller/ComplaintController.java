@@ -38,13 +38,36 @@ public class ComplaintController {
 
     // Fetch all complaints
     @GetMapping("/complaints")
-    public List<ComplaintResponse> getAllComplaints(@RequestHeader(value = "X-User-Category", required = false) String userCategory) {
+    public List<ComplaintResponse> getAllComplaints(
+            @RequestHeader(value = "X-User-Category", required = false) String userCategory) {
         logger.info("Fetching all complaints");
         List<Complaint> complaints;
         if (userCategory != null && userCategory.equalsIgnoreCase("police")) {
             logger.info("User is police, returning only police complaints");
             complaints = repository.findByComplainToIgnoreCase("Police");
-        } else {
+        }
+// ##Do not change plz (Faishal)
+        else if (userCategory != null && userCategory.equalsIgnoreCase("fire")) {
+            logger.info("User is fire, returning only fire complaints");
+            complaints = repository.findByComplainToIgnoreCase("Fire");
+        }
+
+        else if (userCategory != null && userCategory.equalsIgnoreCase("city")) {
+            logger.info("User is fire, returning only fire complaints");
+            complaints = repository.findByComplainToIgnoreCase("City");
+        }
+
+        else if (userCategory != null && userCategory.equalsIgnoreCase("animal")) {
+            logger.info("User is fire, returning only fire complaints");
+            complaints = repository.findByComplainToIgnoreCase("Animal");
+        }
+
+
+
+
+
+
+        else {
             complaints = repository.findAll();
         }
         logger.info("Fetched {} complaints", complaints.size());
@@ -52,25 +75,25 @@ public class ComplaintController {
         List<ComplaintResponse> responseList = new java.util.ArrayList<>();
         for (Complaint c : complaints) {
             String userName = userRepository.findByNid(c.getNid())
-                .map(u -> u.getName())
-                .orElse("");
+                    .map(u -> u.getName())
+                    .orElse("");
             responseList.add(new ComplaintResponse(
-                c.getTrackingId(),
-                userName,
-                c.getUrgency(),
-                c.getComplainTo(),
-                c.getDistrict(),
-                c.getArea(),
-                c.getTags(),
-                c.getDetails(),
-                c.getPhotos(),
-                c.isPostOnTimeline(),
-                c.getLocation(),
-                c.getUpdateNote(),
-                c.getStatus(),
-                c.getFollow(),
-                c.getComment(),
-                c.getTime() // <-- Make sure this is c.getTime()
+                    c.getTrackingId(),
+                    userName,
+                    c.getUrgency(),
+                    c.getComplainTo(),
+                    c.getDistrict(),
+                    c.getArea(),
+                    c.getTags(),
+                    c.getDetails(),
+                    c.getPhotos(),
+                    c.isPostOnTimeline(),
+                    c.getLocation(),
+                    c.getUpdateNote(),
+                    c.getStatus(),
+                    c.getFollow(),
+                    c.getComment(),
+                    c.getTime() // <-- Make sure this is c.getTime()
             ));
         }
         return responseList;
@@ -103,39 +126,39 @@ public class ComplaintController {
     @GetMapping("/complaints/user/{nid}")
     public List<ComplaintResponse> getComplaintsByUser(@PathVariable String nid) {
         List<Complaint> complaints = repository.findAll()
-            .stream()
-            .filter(c -> c.getNid().equals(nid))
-            .toList();
+                .stream()
+                .filter(c -> c.getNid().equals(nid))
+                .toList();
         List<ComplaintResponse> responseList = new ArrayList<>();
         for (Complaint c : complaints) {
             String userName = userRepository.findByNid(c.getNid())
-                .map(u -> u.getName())
-                .orElse("");
+                    .map(u -> u.getName())
+                    .orElse("");
             responseList.add(new ComplaintResponse(
-                c.getTrackingId(),
-                userName,
-                c.getUrgency(),
-                c.getComplainTo(),
-                c.getDistrict(),
-                c.getArea(),
-                c.getTags(),
-                c.getDetails(),
-                c.getPhotos(),
-                c.isPostOnTimeline(),
-                c.getLocation(),
-                c.getUpdateNote(),
-                c.getStatus(),
-                c.getFollow(),
-                c.getComment(),
-                c.getTime()
-            ));
+                    c.getTrackingId(),
+                    userName,
+                    c.getUrgency(),
+                    c.getComplainTo(),
+                    c.getDistrict(),
+                    c.getArea(),
+                    c.getTags(),
+                    c.getDetails(),
+                    c.getPhotos(),
+                    c.isPostOnTimeline(),
+                    c.getLocation(),
+                    c.getUpdateNote(),
+                    c.getStatus(),
+                    c.getFollow(),
+                    c.getComment(),
+                    c.getTime()));
         }
         return responseList;
     }
 
     // Update a complaint's status and update note
     @PutMapping("/complaint/update/{id}")
-    public ResponseEntity<Complaint> updateComplaint(@PathVariable Integer id, @RequestBody Complaint updatedComplaint) {
+    public ResponseEntity<Complaint> updateComplaint(@PathVariable Integer id,
+            @RequestBody Complaint updatedComplaint) {
         logger.info("Updating complaint with id: {}", id);
         Optional<Complaint> existingComplaint = repository.findById(id);
         if (existingComplaint.isPresent()) {
@@ -193,8 +216,7 @@ public class ComplaintController {
     public ResponseEntity<?> uploadPhotos(
             @RequestParam("trackingId") Integer trackingId,
             @RequestParam("nid") String nid,
-            @RequestParam("photos") java.util.List<MultipartFile> photos
-    ) throws IOException {
+            @RequestParam("photos") java.util.List<MultipartFile> photos) throws IOException {
         Optional<Complaint> complaintOpt = repository.findById(trackingId);
         if (complaintOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Complaint not found");
@@ -202,11 +224,13 @@ public class ComplaintController {
         Complaint complaint = complaintOpt.get();
         // Save files
         Path dirPath = Paths.get(uploadDir);
-        if (!Files.exists(dirPath)) Files.createDirectories(dirPath);
+        if (!Files.exists(dirPath))
+            Files.createDirectories(dirPath);
         java.util.List<String> photoPaths = new ArrayList<>();
         for (MultipartFile file : photos) {
             if (!file.isEmpty()) {
-                String filename = System.currentTimeMillis() + "_" + org.springframework.util.StringUtils.cleanPath(file.getOriginalFilename());
+                String filename = System.currentTimeMillis() + "_"
+                        + org.springframework.util.StringUtils.cleanPath(file.getOriginalFilename());
                 Path filePath = dirPath.resolve(filename);
                 file.transferTo(filePath);
                 photoPaths.add("/uploads/" + filename);

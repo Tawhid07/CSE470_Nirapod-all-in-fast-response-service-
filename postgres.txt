@@ -103,7 +103,7 @@ DECLARE
     i INT;
     max_tracking_id INT;
     urgency_levels TEXT[] := ARRAY['High', 'Medium', 'Low'];
-    complain_to_options TEXT[] := ARRAY['Police', 'Fire Service', 'City Corporation', 'Animal Welfare'];
+    complain_to_options TEXT[] := ARRAY['police', 'fire', 'city', 'animal'];
     districts TEXT[] := ARRAY['Dhaka', 'Chattogram', 'Khulna', 'Barisal', 'Rajshahi', 'Sylhet', 'Rangpur', 'Mymensingh'];
     dhaka_areas TEXT[] := ARRAY['Dhanmondi', 'Gulshan', 'Mirpur', 'Uttara', 'Banani', 'Mohammadpur', 'Motijheel', 'Bashundhara', 'Tejgaon', 'Shahbagh', 'Farmgate', 'Paltan', 'Khilgaon', 'Badda', 'Rampura', 'Shyamoli', 'Malibagh', 'Mohakhali', 'Jatrabari', 'Savar', 'Keraniganj', 'Demra', 'Kamalapur', 'Hazaribagh', 'Lalbagh', 'Azimpur', 'Khilkhet', 'Turag', 'Adabor', 'Cantonment', 'Dohar', 'Nawabganj'];
     tags TEXT[] := ARRAY['Theft', 'Chintai', 'Brac taka nia gese', 'Robbery', 'Accident'];
