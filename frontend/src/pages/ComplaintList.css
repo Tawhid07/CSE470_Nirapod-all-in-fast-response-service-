@@ -81,34 +81,6 @@
     background-color: #496e8e;
 }
 
-/* Updated to align the search bar horizontally using flexbox */
-.filter-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px #0003;
-    padding: 32px;
-    z-index: 10;
-    min-width: 380px;
-    max-width: 480px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.filter-bar label {
-    margin-bottom: 16px;
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
 
 .filter-bar input,
 .filter-bar select {
