@@ -86,7 +86,8 @@ const ComplaintList = () => {
     return (
         <div className="complaint-list-container">
             <div style={{ padding: '12px 0 0 0', display: 'flex', justifyContent: 'flex-start', marginLeft: 438 }}>
-                <div style={{ background: '#232b36', borderRadius: 18, padding: 12, marginBottom: 12, display: 'flex', gap: 18, alignItems: 'center', position: 'relative' }}>
+                {/* Position changed here Faishal */}
+                <div style={{ background: '#232b36', borderRadius: 18, padding: 12, marginBottom: 12, display: 'flex', gap: 18, alignItems: 'center', position: 'relative', left:'-350px'  }}>
                     <button
                         ref={filterBtnRef}
                         style={{ borderRadius: 8, padding: '8px 32px', fontSize: 16, border: 'none', background: '#e5e7eb', fontWeight: 600, cursor: 'pointer' }}
@@ -144,7 +145,7 @@ const ComplaintList = () => {
                                 </button>
                                 <button
                                     type="button"
-                                    style={{ borderRadius: 8, padding: '10px 32px', fontSize: 16, border: 'none', background: '#eee', fontWeight: 600, cursor: 'pointer' }}
+                                    style={{ borderRadius: 10, padding: '10px 32px', fontSize: 16, border: 'none', background: '#eee', fontWeight: 600, cursor: 'pointer' }}
                                     onClick={() => { setFilters({ tags: '', urgency: '', status: '' }); setFilterOpen(false); }}
                                 >
                                     Reset
@@ -156,10 +157,10 @@ const ComplaintList = () => {
             </div>
             <input
                 type="text"
+                className="search-box"
                 placeholder="Search by Tracking ID"
                 value={searchTerm}
                 onChange={handleSearch}
- 
             />
             {filteredComplaints.map((complaint) => {
                 console.log('Complaint object:', complaint); // Debug: check structure
