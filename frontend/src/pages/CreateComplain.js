@@ -28,15 +28,20 @@ function Complain() {
     'Khulna',
     'Barisal',
     'Rajshahi',
+    'Sylhet',
+    'Rangpur',
+    'Mymensingh',
   ];
-
+  
   const areaData = {
-    Dhaka: ['Dhanmondi', 'Gulshan', 'Mirpur', 'Uttara', 'Banani'],
-    Chattogram: ['Pahartali', 'Panchlaish', 'Kotwali', 'Halishahar'],
-    Khulna: ['Sonadanga', 'Khalishpur', 'Daulatpur'],
-    Barisal: ['Band Road', 'Nathullabad', 'Rupatali'],
-    Rajshahi: ['Boalia', 'Rajpara', 'Motihar'],
-    // ...dummy data for other districts...
+    Dhaka: ['Dhanmondi','Gulshan','Mirpur','Uttara','Banani','Mohammadpur','Motijheel','Bashundhara','Tejgaon','Shahbagh','Farmgate','Paltan','Khilgaon','Badda','Rampura','Shyamoli','Malibagh','Mohakhali','Jatrabari','Savar','Keraniganj','Demra','Kamalapur','Hazaribagh','Lalbagh','Azimpur','Khilkhet','Turag','Adabor','Cantonment','Dohar','Nawabganj'],
+    Chattogram: ['Pahartali', 'Panchlaish', 'Kotwali', 'Halishahar', 'Agrabad', 'Chawkbazar', 'Bakalia', 'Patenga'],
+    Khulna: ['Sonadanga', 'Khalishpur', 'Daulatpur', 'Rupsha', 'Shibbari', 'Boyra'],
+    Barisal: ['Band Road', 'Nathullabad', 'Rupatali', 'Kaunia', 'Sagardi', 'Chandmari'],
+    Rajshahi: ['Boalia', 'Rajpara', 'Motihar', 'Shah Makhdum', 'Binodpur', 'Kazla'],
+    Sylhet: ['Zindabazar', 'Amberkhana', 'Shahjalal Uposhohor', 'Kumarpara', 'Bandarbazar'],
+    Rangpur: ['Jahaj Company', 'Modern Mor', 'Mahiganj', 'CO Bazar', 'Shapla Chattar'],
+    Mymensingh: ['Ganginarpar', 'Town Hall', 'Charpara', 'Kachari Bazar', 'Shambhuganj'],
   };
 
   const areas = areaData[form.district] || [];

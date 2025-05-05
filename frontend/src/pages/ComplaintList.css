@@ -81,11 +81,13 @@
     background-color: #496e8e;
 }
 
+/* Updated to align the search bar horizontally using flexbox */
 .filter-bar {
-    position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 24px #0003;
@@ -144,4 +146,14 @@
     justify-content: flex-end;
     gap: 12px;
     margin-top: 16px;
+}
+
+.search-bar {
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    width: 50%;
+    margin: 0; /* Removed margin to align properly */
+    box-sizing: border-box;
 }

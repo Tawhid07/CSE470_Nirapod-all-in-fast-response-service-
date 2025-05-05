@@ -9,8 +9,10 @@ const ComplaintList = () => {
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [filters, setFilters] = useState({ tags: '', urgency: '', complainTo: '' });
+    const [filters, setFilters] = useState({ tags: '', urgency: '', status: '' });
     const [filterOpen, setFilterOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredComplaints, setFilteredComplaints] = useState([]);
     const filterBtnRef = useRef(null);
     const filterDropdownRef = useRef(null);
     const navigate = useNavigate();
@@ -34,6 +36,19 @@ const ComplaintList = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [filterOpen]);
+
+    useEffect(() => {
+        setFilteredComplaints(
+            complaints.filter((complaint) => {
+                return (
+                    (!filters.tags || complaint.tags.toLowerCase().includes(filters.tags.toLowerCase())) &&
+                    (!filters.urgency || complaint.urgency.toLowerCase() === filters.urgency.toLowerCase()) &&
+                    (!filters.status || complaint.status.toLowerCase() === filters.status.toLowerCase()) &&
+                    (!searchTerm || complaint.trackingId.toString().includes(searchTerm.trim()))
+                );
+            })
+        );
+    }, [complaints, filters, searchTerm]);
 
     const fetchComplaints = async () => {
         try {
@@ -61,13 +76,9 @@ const ComplaintList = () => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
 
-    const filteredComplaints = complaints.filter((complaint) => {
-        return (
-            (!filters.tags || complaint.tags.toLowerCase().includes(filters.tags.toLowerCase())) &&
-            (!filters.urgency || complaint.urgency.toLowerCase() === filters.urgency.toLowerCase()) &&
-            (!filters.complainTo || complaint.complainTo.toLowerCase().includes(filters.complainTo.toLowerCase()))
-        );
-    });
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -111,15 +122,17 @@ const ComplaintList = () => {
                                 </select>
                             </div>
                             <div style={{ marginBottom: 16 }}>
-                                <label style={{ fontWeight: 500 }}>Complain To:</label>
-                                <input
-                                    type="text"
-                                    name="complainTo"
-                                    value={filters.complainTo}
+                                <label style={{ fontWeight: 500 }}>Sort By:</label>
+                                <select
+                                    name="status"
+                                    value={filters.status}
                                     onChange={handleFilterChange}
-                                    placeholder="Filter by complainTo"
                                     style={{ borderRadius: 8, padding: '10px 18px', fontSize: 16, border: '1px solid #ddd', width: '100%', marginTop: 4, boxSizing: 'border-box', overflow: 'hidden' }}
-                                />
+                                >
+                                    <option value="">All</option>
+                                    <option value="Solved">Solved</option>
+                                    <option value="Unsolved">Unsolved</option>
+                                </select>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                                 <button
@@ -132,7 +145,7 @@ const ComplaintList = () => {
                                 <button
                                     type="button"
                                     style={{ borderRadius: 8, padding: '10px 32px', fontSize: 16, border: 'none', background: '#eee', fontWeight: 600, cursor: 'pointer' }}
-                                    onClick={() => { setFilters({ tags: '', urgency: '', complainTo: '' }); setFilterOpen(false); }}
+                                    onClick={() => { setFilters({ tags: '', urgency: '', status: '' }); setFilterOpen(false); }}
                                 >
                                     Reset
                                 </button>
@@ -141,6 +154,13 @@ const ComplaintList = () => {
                     )}
                 </div>
             </div>
+            <input
+                type="text"
+                placeholder="Search by Tracking ID"
+                value={searchTerm}
+                onChange={handleSearch}
+ 
+            />
             {filteredComplaints.map((complaint) => {
                 console.log('Complaint object:', complaint); // Debug: check structure
                 const displayTime = (() => {
