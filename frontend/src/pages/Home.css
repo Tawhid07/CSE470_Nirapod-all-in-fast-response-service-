@@ -116,3 +116,84 @@
     right: auto;
   }
 }
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999; /* Ensure it stays above all other elements */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  z-index: 10000; /* Ensure the content stays above the overlay */
+}
+
+.comment-box {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.comment-item {
+  margin-bottom: 10px;
+  background: #f5f6fa;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.popup-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.popup-button {
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-weight: 600;
+}
+
+.popup-cancel-button {
+  background: #eee;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+}
+
+.photo-item {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.report-message {
+  margin-bottom: 12px;
+}
+
+.report-button {
+  background: #ef4444;
+}

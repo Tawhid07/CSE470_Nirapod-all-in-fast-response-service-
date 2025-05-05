@@ -97,6 +97,18 @@ function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [sortOpen]);
 
+  useEffect(() => {
+    if (openComment || openPhotos || openReport) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [openComment, openPhotos, openReport]);
+
   // Infinite scroll observer
   const lastPostRef = useCallback(node => {
     if (loading) return;
@@ -290,7 +302,7 @@ function Home() {
           )}
         </div>
       </div>
-      <div className="timeline" style={{ paddingTop: 8 }}>
+      <div className="timeline" style={{ paddingTop: 1 }}>
         {posts.map((post, idx) => {
           const isLast = idx === posts.length - 1;
           const photoArr = post.photos ? post.photos.split(',').map(p => p.trim()).filter(Boolean) : [];
@@ -325,59 +337,59 @@ function Home() {
               </div>
               {/* Comment Popup */}
               {openComment === post.trackingId && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#000a', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 320, maxWidth: 420 }}>
+                <div className="popup-overlay">
+                  <div className="popup-content">
                     <h3>Comments</h3>
-                    <div style={{ maxHeight: 220, overflowY: 'auto', marginBottom: 16 }}>
+                    <div className="comment-box">
                       {(() => {
                         let commentObj = {};
                         try {
                           commentObj = post.comment ? JSON.parse(post.comment) : {};
                         } catch { commentObj = {}; }
                         const keys = Object.keys(commentObj);
-                        if (keys.length === 0) return <div style={{ color: '#888', marginBottom: 8 }}>No comments yet.</div>;
+                        if (keys.length === 0) return <div className="no-comments">No comments yet.</div>;
                         return keys.map(key => (
-                          <div key={key} style={{ marginBottom: 10, background: '#f5f6fa', borderRadius: 8, padding: '8px 12px' }}>
-                            <b>{commentUserNames[key] || key}:</b> <span style={{ color: '#333' }}>{commentObj[key]}</span>
+                          <div key={key} className="comment-item">
+                            <b>{commentUserNames[key] || key}:</b> <span>{commentObj[key]}</span>
                           </div>
                         ));
                       })()}
                     </div>
-                    <textarea value={commentInput} onChange={e => setCommentInput(e.target.value)} style={{ width: '100%', minHeight: 80, borderRadius: 8, padding: 8 }} placeholder="Write your comment..." />
-                    <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
-                      <button onClick={() => handleAddComment(post.trackingId)} style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600 }}>Submit</button>
-                      <button onClick={() => setOpenComment(null)} style={{ background: '#eee', border: 'none', borderRadius: 8, padding: '8px 24px' }}>Cancel</button>
+                    <textarea value={commentInput} onChange={e => setCommentInput(e.target.value)} className="comment-textarea" placeholder="Write your comment..." />
+                    <div className="popup-buttons">
+                      <button onClick={() => handleAddComment(post.trackingId)} className="popup-button">Submit</button>
+                      <button onClick={() => setOpenComment(null)} className="popup-cancel-button">Cancel</button>
                     </div>
                   </div>
                 </div>
               )}
               {/* Photos Popup */}
               {openPhotos === post.trackingId && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#000a', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 320 }}>
+                <div className="popup-overlay">
+                  <div className="popup-content">
                     <h3>Photos</h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                    <div className="photo-box">
                       {photoArr.map((p, i) => (
-                        <img key={i} src={`http://localhost:8080/${p.replace('/uploads/', '')}`} alt="photo" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #ccc' }} />
+                        <img key={i} src={`http://localhost:8080/${p.replace('/uploads/', '')}`} alt="photo" className="photo-item" />
                       ))}
                     </div>
                     <input type="file" multiple onChange={e => setPhotoFiles(Array.from(e.target.files))} />
-                    <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
-                      <button onClick={() => handleUploadPhotos(post.trackingId)} style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600 }}>Upload</button>
-                      <button onClick={() => setOpenPhotos(null)} style={{ background: '#eee', border: 'none', borderRadius: 8, padding: '8px 24px' }}>Close</button>
+                    <div className="popup-buttons">
+                      <button onClick={() => handleUploadPhotos(post.trackingId)} className="popup-button">Upload</button>
+                      <button onClick={() => setOpenPhotos(null)} className="popup-cancel-button">Close</button>
                     </div>
                   </div>
                 </div>
               )}
               {/* Report Popup */}
               {openReport === post.trackingId && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#000a', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ background: '#fff', borderRadius: 12, padding: 32, minWidth: 320 }}>
+                <div className="popup-overlay">
+                  <div className="popup-content">
                     <h3>Report</h3>
-                    <div style={{ marginBottom: 12 }}>Are you sure you want to report this post?</div>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                      <button onClick={() => handleReport(post.trackingId)} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600 }}>Report</button>
-                      <button onClick={() => setOpenReport(null)} style={{ background: '#eee', border: 'none', borderRadius: 8, padding: '8px 24px' }}>Cancel</button>
+                    <div className="report-message">Are you sure you want to report this post?</div>
+                    <div className="popup-buttons">
+                      <button onClick={() => handleReport(post.trackingId)} className="popup-button report-button">Report</button>
+                      <button onClick={() => setOpenReport(null)} className="popup-cancel-button">Cancel</button>
                     </div>
                   </div>
                 </div>
