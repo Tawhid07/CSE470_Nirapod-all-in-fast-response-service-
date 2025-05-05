@@ -64,11 +64,14 @@ function Navbar() {
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome, {userName}<div>Police IT</div></div>
       </nav>
     );
     
-  } else if (categories === 'fire') {
+  } 
+  
+  
+  else if (categories === 'fire') {
     return (
       <nav className="navbar-custom">
         <div className="navbar-logo-box">
@@ -85,17 +88,80 @@ function Navbar() {
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
-                <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link>
+                {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
                 <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
               </div>
             )}
           </div>
         </div>
-        <div className="navbar-welcome-msg">Welcome, {userName}</div>
+        <div className="navbar-welcome-msg">Welcome, {userName}<div>Fire Service IT</div></div>
+      </nav>
+    );
+  } 
+  
+  else if (categories === 'animal') {
+    return (
+      <nav className="navbar-custom">
+        <div className="navbar-logo-box">
+          <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
+        </div>
+        <div className="navbar-btn-group">
+          <a href="/home" className="navbar-btn">Home</a>
+          <a href="/complains" className="navbar-btn">Complains</a>
+          <div className="navbar-profile-dropdown" ref={dropdownRef}>
+            <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
+              Profile <span style={{marginLeft: 6}}>▼</span>
+            </button>
+            {dropdownOpen && (
+              <div className="navbar-dropdown-menu">
+                <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
+                {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
+                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="navbar-welcome-msg">Welcome, {userName}<div>Animal Welfare IT</div></div>
       </nav>
     );
   }
+
+
+
+
+
+
+  
+  else if (categories === 'city') {
+    return (
+      <nav className="navbar-custom">
+        <div className="navbar-logo-box">
+          <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
+        </div>
+        <div className="navbar-btn-group">
+          <a href="/home" className="navbar-btn">Home</a>
+          <a href="/complains" className="navbar-btn">Complains</a>
+          <div className="navbar-profile-dropdown" ref={dropdownRef}>
+            <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
+              Profile <span style={{marginLeft: 6}}>▼</span>
+            </button>
+            {dropdownOpen && (
+              <div className="navbar-dropdown-menu">
+                <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
+                {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
+                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="navbar-welcome-msg">Welcome, {userName}<div>City Corp IT</div></div>
+      </nav>
+    );
+  }
+  
 
   return (
     <nav className="navbar-custom">
