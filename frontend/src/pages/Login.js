@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import logo from '../image/logo.png';
+import googleIcon from '../image/google-icon.png';
 
 function Login() {
   const [step, setStep] = useState(1);
@@ -64,6 +66,25 @@ function Login() {
     setForgotLoading(false);
   };
 
+  // Google Login handler
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      const res = await axios.post('/api/auth/google-login', { idToken });
+      if (res.data && res.data.user && res.data.user.nid) {
+        localStorage.setItem('nirapod_identifier', res.data.user.nid);
+        if (res.data.user.categories) {
+          localStorage.setItem('categories', res.data.user.categories);
+        }
+        window.location.href = '/home';
+      } else {
+        setMessage('User not found. Please sign up first.');
+      }
+    } catch (err) {
+      setMessage('Google login failed or user not found.');
+    }
+  };
+
   return (
     <div className="login-bg">
       <div className="login-split">
@@ -82,6 +103,27 @@ function Login() {
                 <button className="login-btn" type="submit">Login</button>
               </form>
             )}
+            {step === 1 && (
+              <div className="google-btn-wrapper" style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ marginBottom: '0.5rem', fontWeight: 500, color: '#fff', fontSize: '1.05rem', textAlign: 'center' }}>
+                  Or sign in with Google
+                </div>
+                <GoogleLogin
+                  onSuccess={handleGoogleLogin}
+                  onError={() => setMessage('Google login failed')}
+                  width="100%"
+                  text="continue_with"
+                  useOneTap={false}
+                  theme="outline"
+                  shape="rectangular"
+                  logo_alignment="center"
+                  ux_mode="popup"
+                  type="icon"
+                  size="large"
+                  cancel_on_tap_outside={false}
+                />
+              </div>
+            )}
             {step === 2 && (
               <form onSubmit={handleOtp}>
                 <input name="otp" placeholder="Enter OTP" value={form.otp} onChange={handleChange} required />
@@ -98,11 +140,11 @@ function Login() {
             <div className="login-links">
               {step !== 3 ? (
                 <>
-                  <a href="#" className="login-link" onClick={e => { e.preventDefault(); setStep(3); setMessage(''); }}>Forgotten password?</a>
+                  <button type="button" className="login-link" onClick={e => { e.preventDefault(); setStep(3); setMessage(''); }}>Forgotten password?</button>
                   <a href="/signup" className="login-link">Create an account</a>
                 </>
               ) : (
-                <a href="#" className="login-link" onClick={e => { e.preventDefault(); setStep(1); setMessage(''); }}>Remembered password?</a>
+                <button type="button" className="login-link" onClick={e => { e.preventDefault(); setStep(1); setMessage(''); }}>Remembered password?</button>
               )}
             </div>
           </div>

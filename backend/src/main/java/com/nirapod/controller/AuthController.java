@@ -12,10 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +38,9 @@ public class AuthController {
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
+
+    @Value("${google.client.id}")
+    private String googleClientId;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
@@ -205,6 +215,73 @@ public class AuthController {
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + ex.getMessage());
+        }
+    }
+
+    @PostMapping("/google-signup")
+    public ResponseEntity<?> googleSignup(@RequestBody Map<String, String> payload) {
+        String idTokenString = payload.get("idToken");
+        if (idTokenString == null) {
+            return ResponseEntity.badRequest().body("Missing Google ID token");
+        }
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                GoogleIdToken.Payload googlePayload = idToken.getPayload();
+                String email = googlePayload.getEmail();
+                String name = (String) googlePayload.get("name");
+                // Only check if user exists, do not create user here
+                if (authService.findByEmail(email).isPresent()) {
+                    return ResponseEntity.badRequest().body("User already exists");
+                }
+                // Return name and email to frontend for pre-filling
+                return ResponseEntity.ok(Map.of(
+                        "message", "Google token valid",
+                        "user", Map.of("name", name, "email", email)
+                ));
+            } else {
+                return ResponseEntity.status(401).body("Invalid Google ID token");
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            return ResponseEntity.status(500).body("Google token verification failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        String idTokenString = payload.get("idToken");
+        if (idTokenString == null) {
+            return ResponseEntity.badRequest().body("Missing Google ID token");
+        }
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                GoogleIdToken.Payload googlePayload = idToken.getPayload();
+                String email = googlePayload.getEmail();
+                Optional<User> userOpt = authService.findByEmail(email);
+                if (userOpt.isPresent()) {
+                    return ResponseEntity.ok(Map.of(
+                            "message", "Google login successful",
+                            "user", userOpt.get()
+                    ));
+                } else {
+                    return ResponseEntity.status(404).body("User not found");
+                }
+            } else {
+                return ResponseEntity.status(401).body("Invalid Google ID token");
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            return ResponseEntity.status(500).body("Google token verification failed: " + e.getMessage());
         }
     }
 }

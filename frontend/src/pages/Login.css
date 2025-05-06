@@ -135,15 +135,23 @@ html, body {
 }
 
 .login-link {
+  background: none;
+  border: none;
   color: #60a5fa;
-  text-decoration: none;
+  cursor: pointer;
   font-size: 0.98rem;
+  text-decoration: none;
   transition: color 0.2s;
+  padding: 0;
 }
 
 .login-link:hover {
   color: #2563eb;
   text-decoration: underline;
+}
+
+.google-btn-wrapper {
+  margin-bottom: 1.2rem;
 }
 
 .login-footer {

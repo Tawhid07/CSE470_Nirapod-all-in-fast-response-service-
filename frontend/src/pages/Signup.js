@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Signup.css';
 import logo from '../image/logo.png';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import googleIcon from '../image/google-icon.png';
 
 const initialForm = {
   name: '', phoneNumber: '', email: '', password: '', confirmPassword: '',
@@ -17,6 +19,29 @@ function Signup() {
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isGoogleSignup, setIsGoogleSignup] = useState(false);
+
+  // Google Signup handler
+  const handleGoogleSignup = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      const res = await axios.post('/api/auth/google-signup', { idToken });
+      if (res.data && res.data.user) {
+        setForm(f => ({
+          ...f,
+          name: res.data.user.name || '',
+          email: res.data.user.email || '',
+        }));
+        setMessage('Google account detected. Please fill in the remaining details.');
+        setStep(3); // Go directly to password step
+        setIsGoogleSignup(true);
+      } else {
+        setMessage('Google signup failed.');
+      }
+    } catch (err) {
+      setMessage('Google signup failed or user already exists.');
+    }
+  };
 
   const handleChange = e => {
     const { name, value, files } = e.target;
@@ -36,14 +61,13 @@ function Signup() {
     e.preventDefault();
     setMessage('');
     if (step === 1) {
-      if (form.password !== form.confirmPassword) {
-        setMessage('Passwords do not match');
+      if (isGoogleSignup) {
+        setStep(3); // Skip directly to password step for Google signup
         return;
       }
       try {
         await axios.post('/api/auth/send-otp', {
           email: form.email,
-          phoneNumber: form.phoneNumber
         });
         setStep(2);
       } catch (err) {
@@ -52,8 +76,18 @@ function Signup() {
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
+      if (form.password !== form.confirmPassword) {
+        setMessage('Passwords do not match');
+        return;
+      }
+      if (!form.password || !form.confirmPassword) {
+        setMessage('Password is required');
+        return;
+      }
       setStep(4);
     } else if (step === 4) {
+      setStep(5);
+    } else if (step === 5) {
       // Prepare FormData for all fields and files
       const formData = new FormData();
       // Map userType/affiliation to backend categories
@@ -87,7 +121,7 @@ function Signup() {
           maxContentLength: 20 * 1024 * 1024, // 20MB
           maxBodyLength: 20 * 1024 * 1024 // 20MB
         });
-        setStep(5);
+        setStep(6);
       } catch (err) {
         if (err.response && err.response.data) {
           setMessage(typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data));
@@ -100,7 +134,7 @@ function Signup() {
 
   const handlePrevious = (e) => {
     e.preventDefault();
-    if (step > 1 && step < 5) setStep(step - 1);
+    if (step > 1 && step < 6) setStep(step - 1);
   };
 
   return (
@@ -115,10 +149,52 @@ function Signup() {
           <div className="signup-form-box">
             <h2>Sign Up</h2>
             {step === 1 && (
+              <div className="google-btn-wrapper" style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ marginBottom: '0.5rem', fontWeight: 500, color: '#fff', fontSize: '1.05rem', textAlign: 'center' }}>
+                  Sign up with Google
+                </div>
+                <GoogleLogin
+                  onSuccess={handleGoogleSignup}
+                  onError={() => setMessage('Google signup failed')}
+                  width="100%"
+                  text="signup_with"
+                  useOneTap={false}
+                  theme="outline"
+                  shape="rectangular"
+                  logo_alignment="center"
+                  ux_mode="popup"
+                  type="icon"
+                  size="large"
+                  cancel_on_tap_outside={false}
+                />
+              </div>
+            )}
+            {step === 1 && (
               <form onSubmit={handleNext}>
                 <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-                <input name="phoneNumber" placeholder="Phone Number" value={form.phoneNumber} onChange={handleChange} required />
                 <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+                <button className="signup-btn" type="submit">Next</button>
+              </form>
+            )}
+            {step === 2 && !isGoogleSignup && (
+              <form onSubmit={handleNext}>
+                <input name="otp" placeholder="OTP" value={form.otp} onChange={handleChange} required />
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                  <button type="button" className="signup-btn" onClick={handlePrevious}>Previous</button>
+                  <button className="signup-btn" type="submit">Next</button>
+                </div>
+                <button type="button" className="signup-link-btn" onClick={() => setMessage('Resend not implemented')}>Resend Code</button>
+              </form>
+            )}
+            {step === 2 && isGoogleSignup && (
+              <div style={{marginBottom: 16}}>
+                <div>OTP step skipped for Google signup.</div>
+                <button className="signup-btn" onClick={handleNext}>Next</button>
+              </div>
+            )}
+            {step === 3 && (
+              <form onSubmit={handleNext}>
+                <input name="phoneNumber" placeholder="Phone Number" value={form.phoneNumber} onChange={handleChange} required />
                 <div className="signup-password-input-wrapper">
                   <input
                     name="password"
@@ -156,20 +232,13 @@ function Signup() {
                   </button>
                 </div>
                 <button type="button" className="signup-password-generator-btn" onClick={generatePassword}>Generate Password</button>
-                <button className="signup-btn" type="submit">Next</button>
-              </form>
-            )}
-            {step === 2 && (
-              <form onSubmit={handleNext}>
-                <input name="otp" placeholder="OTP" value={form.otp} onChange={handleChange} required />
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                   <button type="button" className="signup-btn" onClick={handlePrevious}>Previous</button>
                   <button className="signup-btn" type="submit">Next</button>
                 </div>
-                <button type="button" className="signup-link-btn" onClick={() => setMessage('Resend not implemented')}>Resend Code</button>
               </form>
             )}
-            {step === 3 && (
+            {step === 4 && (
               <form onSubmit={handleNext}>
                 <input name="nid" placeholder="NID" value={form.nid} onChange={handleChange} required />
                 <input name="presentAddress" placeholder="Present Address" value={form.presentAddress} onChange={handleChange} required />
@@ -204,7 +273,7 @@ function Signup() {
                 </div>
               </form>
             )}
-            {step === 4 && (
+            {step === 5 && (
               <form onSubmit={handleNext}>
                 <label>NID File: <input type="file" name="nidFile" onChange={handleChange} required /></label>
                 <label>Driving Licence File: <input type="file" name="drivingLicenceFile" onChange={handleChange} /></label>
@@ -220,7 +289,7 @@ function Signup() {
                 </div>
               </form>
             )}
-            {step === 5 && (
+            {step === 6 && (
               <div>
                 <h3>Your signup is complete. Account approval takes 1-48 hours. Check your registered email for updates.</h3>
                 <button className="signup-btn" onClick={() => window.location.href = '/login'}>Done</button>

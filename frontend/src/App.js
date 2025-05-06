@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Login from './pages/Login';
@@ -15,7 +15,8 @@ import ComplaintList, { UserComplaintList } from './pages/ComplaintList';
 import ComplaintDetails from './pages/ComplaintDetails';
 import Investigate from './pages/Investigate';
 import Profile from './pages/Profile';
-
+import Notifications from './pages/Notifications';
+import LiveChat from './pages/LiveChat';
 
 function App() {
   const location = useLocation();
@@ -52,6 +53,8 @@ function App() {
         <Route path="/complaint/:id" element={<ComplaintDetails />} />
         <Route path="/investigate" element={<Investigate />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/livechat" element={<LiveChat />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </>

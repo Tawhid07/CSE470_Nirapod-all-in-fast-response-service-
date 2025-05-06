@@ -55,6 +55,8 @@ cd frontend
 npm install
 npm install leaflet
 npm install leaflet-control-geocoder
+npm install @react-oauth/google
+npm install ws
 
 npm start
 
@@ -63,6 +65,9 @@ cd backend
 mvn clean install
 mvn spring-boot:run
 
+
+## live chat server
+node backend/livechat-server.js
 # 16. Press Q to exit from the psql prompt
 
 project name 

@@ -370,7 +370,7 @@ function Home() {
                     <h3>Photos</h3>
                     <div className="photo-box">
                       {photoArr.map((p, i) => (
-                        <img key={i} src={`http://localhost:8080/${p.replace('/uploads/', '')}`} alt="photo" className="photo-item" />
+                        <img key={i} src={`http://localhost:8080/${p.replace('/uploads/', '')}`} alt="" className="photo-item" />
                       ))}
                     </div>
                     <input type="file" multiple onChange={e => setPhotoFiles(Array.from(e.target.files))} />

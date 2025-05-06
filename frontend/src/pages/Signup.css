@@ -169,7 +169,6 @@ html, body {
   border-radius: 6px;
   font-size: 0.98rem;
   padding: 0.4rem 0.8rem;
-  margin-bottom: 1.2rem;
   margin-top: 0;
   margin-left: auto;
   margin-right: 0;
@@ -252,6 +251,43 @@ html, body {
 
 .footer-link:hover {
   color: #f9d342;
+}
+
+.google-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.google-btn-wrapper .google-login-btn {
+  width: 100%;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.2s;
+  max-width: 160px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px #0001;
+  gap: 0.5rem;
+}
+
+.google-btn-wrapper .google-login-btn:hover {
+  background: #16a34a;;
+}
+
+.google-btn-wrapper .google-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
 }
 
 @media (max-width: 900px) {
