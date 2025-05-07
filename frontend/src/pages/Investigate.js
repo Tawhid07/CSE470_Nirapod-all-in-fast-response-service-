@@ -34,7 +34,7 @@ function Investigate() {
   const selectedOption = searchOptions.find(opt => opt.value === searchBy);
 
   return (
-    <div style={{ background: '#181e26', minHeight: '100vh', padding: 0, fontFamily: 'Fira Mono, monospace' }}>
+    <div style={{ background: '#232831', minHeight: '100vh', padding: 0, fontFamily: 'Fira Mono, monospace' }}>
       <div style={{ paddingTop: 60, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
           <span style={{ color: '#fff', fontSize: 22, letterSpacing: 1, marginRight: 18 }}>Looking for :</span>
