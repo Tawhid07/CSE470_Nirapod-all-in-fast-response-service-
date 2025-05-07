@@ -34,7 +34,7 @@ function Tracker() {
   };
 
   return (
-    <div style={{ background: '#181e26', minHeight: '100vh', padding: '0', fontFamily: 'Fira Mono, monospace' }}>
+    <div style={{ background: '#232831', minHeight: '100vh', padding: '0', fontFamily: 'Fira Mono, monospace' }}>
       <div style={{ paddingTop: 60, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ color: '#fff', fontSize: 22, marginBottom: 18, letterSpacing: 1 }}>Tracking ID :</div>
         <form onSubmit={handleSearch} style={{ marginBottom: 32 }}>
