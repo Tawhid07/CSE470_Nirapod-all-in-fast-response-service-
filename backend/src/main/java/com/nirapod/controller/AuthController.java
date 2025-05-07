@@ -72,7 +72,7 @@ public class AuthController {
             String mappedCategory = "normal";
             if (categories != null) {
                 String cat = categories.trim().toLowerCase();
-                if (cat.equals("police") || cat.equals("fire") || cat.equals("animal") || cat.equals("city") || cat.equals("normal")) {
+                if (cat.equals("police") || cat.equals("fire") || cat.equals("animal") || cat.equals("city") || cat.equals("normal") || cat.equals("admin")) {
                     mappedCategory = cat;
                 }
             }

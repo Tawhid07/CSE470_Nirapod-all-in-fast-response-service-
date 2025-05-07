@@ -211,6 +211,7 @@ function Navbar() {
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
+                <Link to="/add-admin" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Add Admin</Link>
                 <NotificationLink />
                 <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>

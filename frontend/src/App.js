@@ -19,6 +19,7 @@ import Notifications from './pages/Notifications';
 import LiveChat from './pages/LiveChat';
 import AdminHome from './pages/AdminHome';
 import ReportList from './pages/ReportList';
+import AddAdmin from './pages/AddAdmin';
 
 function App() {
   const location = useLocation();
@@ -59,6 +60,7 @@ function App() {
         <Route path="/livechat" element={<LiveChat />} />
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/reports" element={<ReportList />} />
+        <Route path="/add-admin" element={<AddAdmin />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </>

@@ -68,7 +68,7 @@ CREATE TABLE "usr_complain" (
 
 CREATE TABLE "notifications" (
     id BIGSERIAL PRIMARY KEY,
-    user_id CHAR(10) REFERENCES "usr_user"(NID),
+    user_id CHAR(10) REFERENCES "usr_user"(NID) ON DELETE CASCADE,
     message TEXT NOT NULL,
     related_post_id INTEGER REFERENCES "usr_complain"(tracking_ID) ON DELETE CASCADE,
     read BOOLEAN NOT NULL DEFAULT FALSE,
