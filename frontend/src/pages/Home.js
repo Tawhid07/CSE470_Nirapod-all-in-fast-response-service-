@@ -37,7 +37,8 @@ function Home() {
     setLoading(true);
     try {
       const res = await ComplaintService.getAllComplaints();
-      let filtered = res;
+      // Only show posts where postOnTimeline is true
+      let filtered = res.filter(p => p.postOnTimeline === true);
       if (filters.area) filtered = filtered.filter(p => (p.area || '').toLowerCase().includes(filters.area.toLowerCase()));
       if (filters.urgency) filtered = filtered.filter(p => (p.urgency || '').toLowerCase() === filters.urgency.toLowerCase());
       if (filters.district) filtered = filtered.filter(p => (p.district || '').toLowerCase().includes(filters.district.toLowerCase()));
