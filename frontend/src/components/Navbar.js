@@ -77,7 +77,7 @@ function Navbar() {
   if (categories === 'police') {
     return (
       <nav className="navbar-custom">
-        <div className="navbar-logo-box">
+        <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
         </div>
         <div className="navbar-btn-group">
@@ -109,7 +109,7 @@ function Navbar() {
   else if (categories === 'fire') {
     return (
       <nav className="navbar-custom">
-        <div className="navbar-logo-box">
+        <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
         </div>
         <div className="navbar-btn-group">
@@ -139,7 +139,7 @@ function Navbar() {
   else if (categories === 'animal') {
     return (
       <nav className="navbar-custom">
-        <div className="navbar-logo-box">
+        <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
         </div>
         <div className="navbar-btn-group">
@@ -168,7 +168,7 @@ function Navbar() {
   else if (categories === 'city') {
     return (
       <nav className="navbar-custom">
-        <div className="navbar-logo-box">
+        <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
         </div>
         <div className="navbar-btn-group">
@@ -197,7 +197,7 @@ function Navbar() {
   if (categories === 'admin') {
     return (
       <nav className="navbar-custom">
-        <div className="navbar-logo-box">
+        <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
         </div>
         <div className="navbar-btn-group">
@@ -225,7 +225,7 @@ function Navbar() {
 
   return (
     <nav className="navbar-custom">
-      <div className="navbar-logo-box">
+      <div className="navbar-logo-box" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
         <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
       </div>
       <div className="navbar-btn-group">
