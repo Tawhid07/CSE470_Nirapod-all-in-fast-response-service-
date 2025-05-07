@@ -66,6 +66,15 @@ CREATE TABLE "usr_complain" (
     Report TEXT -- Comma separated NIDs of users who reported this post, NULL at first
 );
 
+CREATE TABLE "notifications" (
+    id BIGSERIAL PRIMARY KEY,
+    user_id CHAR(10) REFERENCES "usr_user"(NID),
+    message TEXT NOT NULL,
+    related_post_id INTEGER REFERENCES "usr_complain"(tracking_ID) ON DELETE CASCADE,
+    read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 EOF
 
 echo "\n# Usr_complain.Status: 0 = unsolved, 1 = in progress, 2 = solved"

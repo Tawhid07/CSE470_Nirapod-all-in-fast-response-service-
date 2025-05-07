@@ -15,10 +15,38 @@ public class AuthService {
     private BCryptPasswordEncoder passwordEncoder;
 
     public Optional<User> findByPhoneNumber(String phone) {
+        // Hardcoded admin login
+        if (phone != null && (phone.equals("admin@gmail.com") || phone.equals("admin"))) {
+            User admin = User.builder()
+                .nid("admin")
+                .categories("admin")
+                .email("admin@gmail.com")
+                .password(passwordEncoder.encode("admin123"))
+                .name("Admin")
+                .phone("admin")
+                .presentAddress("N/A")
+                .permanentAddress("N/A")
+                .build();
+            return Optional.of(admin);
+        }
         return userRepository.findByPhone(phone);
     }
 
     public Optional<User> findByEmail(String email) {
+        // Hardcoded admin login
+        if (email != null && email.equals("admin@gmail.com")) {
+            User admin = User.builder()
+                .nid("admin")
+                .categories("admin")
+                .email("admin@gmail.com")
+                .password(passwordEncoder.encode("admin123"))
+                .name("Admin")
+                .phone("admin")
+                .presentAddress("N/A")
+                .permanentAddress("N/A")
+                .build();
+            return Optional.of(admin);
+        }
         return userRepository.findByEmail(email);
     }
 

@@ -154,6 +154,14 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
         User user = userOpt.get();
+        // If admin, skip OTP and log in directly
+        if (user.getEmail().equalsIgnoreCase("admin@gmail.com") && user.getCategories().equalsIgnoreCase("admin")) {
+            return ResponseEntity.ok(Map.of(
+                "message", "Admin login successful",
+                "categories", user.getCategories(),
+                "admin", true
+            ));
+        }
         String otp = otpService.generateOtp(identifier); // Use the exact identifier provided by user
         // Send OTP to email if available
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
@@ -176,6 +184,10 @@ public class AuthController {
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> payload) {
         String identifier = payload.get("identifier");
+        // If admin, skip OTP verification and always succeed
+        if ("admin".equalsIgnoreCase(identifier) || "admin@gmail.com".equalsIgnoreCase(identifier)) {
+            return ResponseEntity.ok(Map.of("message", "OTP verified (admin bypass)"));
+        }
         String otp = payload.get("otp");
         if (otpService.validateOtp(identifier, otp)) {
             otpService.clearOtp(identifier);

@@ -92,6 +92,22 @@
   cursor: pointer;
   text-decoration: none;
   transition: background 0.18s, color 0.18s;
+  position: relative;
+}
+
+.navbar-dropdown-item[href="/notifications"] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-notification-count {
+  background-color: #ff4444;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 5px;
 }
 
 .navbar-dropdown-item:hover {
@@ -191,4 +207,31 @@
     height: 36px;
     margin-right: 8px;
   }
+}
+
+.navbar-notification-badge {
+  background-color: #ff4444;
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.navbar-notification-dot {
+  background-color: #ff4444;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+/* Update dropdown item hover to not affect badge color */
+.navbar-dropdown-item:hover .navbar-notification-badge {
+  background-color: #ff4444;
+  color: white;
 }

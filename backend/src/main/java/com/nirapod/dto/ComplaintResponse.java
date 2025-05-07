@@ -17,6 +17,7 @@ public class ComplaintResponse {
     private String follow;
     private String comment;
     private java.time.LocalDateTime time;
+    private String report;
 
     public ComplaintResponse() {}
 
@@ -57,6 +58,26 @@ public class ComplaintResponse {
         this.time = time;
     }
 
+    public ComplaintResponse(Integer trackingId, String userName, String urgency, String complainTo, String district, String area, String tags, String details, String photos, Boolean postOnTimeline, String location, String updateNote, Integer status, String follow, String comment, java.time.LocalDateTime time, String report) {
+        this.trackingId = trackingId;
+        this.userName = userName;
+        this.urgency = urgency;
+        this.complainTo = complainTo;
+        this.district = district;
+        this.area = area;
+        this.tags = tags;
+        this.details = details;
+        this.photos = photos;
+        this.postOnTimeline = postOnTimeline;
+        this.location = location;
+        this.updateNote = updateNote;
+        this.status = status;
+        this.follow = follow;
+        this.comment = comment;
+        this.time = time;
+        this.report = report;
+    }
+
     // Getters and setters for all fields
     public Integer getTrackingId() { return trackingId; }
     public void setTrackingId(Integer trackingId) { this.trackingId = trackingId; }
@@ -90,6 +111,8 @@ public class ComplaintResponse {
     public void setComment(String comment) { this.comment = comment; }
     public java.time.LocalDateTime getTime() { return time; }
     public void setTime(java.time.LocalDateTime time) { this.time = time; }
+    public String getReport() { return report; }
+    public void setReport(String report) { this.report = report; }
     public String getStatusText() {
         if (status == null) return "Unsolved";
         switch (status) {

@@ -17,6 +17,31 @@ function ComplaintDetails() {
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState('');
 
+  // Admin-only actions
+  const isAdmin = localStorage.getItem('categories') === 'admin';
+
+  const handleDeleteReport = async () => {
+    if (!window.confirm('Are you sure you want to delete the report for this post?')) return;
+    try {
+      await axios.put(`/api/complaint/update/${complaint.trackingId}`, { report: '' });
+      setComplaint({ ...complaint, report: '' });
+      alert('Report deleted successfully.');
+    } catch (err) {
+      alert('Failed to delete report.');
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) return;
+    try {
+      await axios.delete(`/api/complaint/${complaint.trackingId}`);
+      alert('Post deleted successfully.');
+      navigate('/reports');
+    } catch (err) {
+      alert('Failed to delete post.');
+    }
+  };
+
   const fetchComplaintDetails = async () => {
     try {
       setLoading(true);
@@ -209,15 +234,20 @@ function ComplaintDetails() {
             <div className="detail-value detail-text-area">{complaint.updateNote}</div>
           </div>
         )}
-        {/* Update Component */}
-        <UpdateComplaint 
-          complaint={complaint} 
-          onUpdateSuccess={handleUpdateSuccess} 
-        />
+        {/* Update Component and Admin Delete Buttons */}
+        <div className="update-complaint-container" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <UpdateComplaint 
+            complaint={complaint} 
+            onUpdateSuccess={handleUpdateSuccess} 
+          />
+          {isAdmin && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16, marginTop: 0 }}>
+              <button className="update-button" style={{ background: '#f59e42' }} onClick={handleDeleteReport}>Delete Report</button>
+              <button className="update-button" style={{ background: '#e74c3c' }} onClick={handleDeletePost}>Delete Post</button>
+            </div>
+          )}
+        </div>
       </div>
-      <button className="back-button" onClick={handleBackToList}>
-        Back to Complaints
-      </button>
     </div>
   );
 }

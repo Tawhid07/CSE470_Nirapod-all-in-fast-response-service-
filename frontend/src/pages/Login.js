@@ -25,8 +25,13 @@ function Login() {
       if (response.data.categories) {
         localStorage.setItem('categories', response.data.categories);
       }
+      // If admin, log in directly and redirect
+      if (response.data.admin) {
+        localStorage.setItem('nirapod_identifier', 'admin');
+        window.location.href = '/admin';
+        return;
+      }
       setIdentifier(form.phoneNumber); // Save identifier for OTP step
-      // Do NOT set nirapod_identifier here, only after OTP verification
       setStep(2);
     } catch (err) {
       setMessage('Invalid credentials');
@@ -45,6 +50,13 @@ function Login() {
       const res = await axios.get(`/api/user/by-identifier?value=${encodeURIComponent(identifier)}`);
       if (res.data && res.data.nid) {
         localStorage.setItem('nirapod_identifier', res.data.nid);
+        
+        // Create security notification with correct structure
+        await axios.post('/api/notifications', {
+          userId: res.data.nid,
+          message: `New login detected from ${navigator.platform} at ${new Date().toLocaleString()}`,
+          read: false
+        });
       }
       window.location.href = '/home';
     } catch (err) {
@@ -76,6 +88,14 @@ function Login() {
         if (res.data.user.categories) {
           localStorage.setItem('categories', res.data.user.categories);
         }
+
+        // Create security notification for Google login with correct structure
+        await axios.post('/api/notifications', {
+          userId: res.data.user.nid,
+          message: `New login via Google detected from ${navigator.platform} at ${new Date().toLocaleString()}`,
+          read: false
+        });
+
         window.location.href = '/home';
       } else {
         setMessage('User not found. Please sign up first.');

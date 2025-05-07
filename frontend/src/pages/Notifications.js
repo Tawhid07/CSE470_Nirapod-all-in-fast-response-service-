@@ -10,10 +10,6 @@ function Notifications() {
   const userId = localStorage.getItem('nirapod_identifier');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
   const fetchNotifications = async () => {
     if (!userId) {
       setError('Please log in to view notifications');
@@ -22,62 +18,95 @@ function Notifications() {
     }
 
     try {
+      console.log('Fetching notifications for user:', userId);
       const res = await axios.get(`/api/notifications/user/${userId}`);
-      setNotifications(res.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch notifications');
-      setLoading(false);
-    }
-  };
+      console.log('Notifications response:', res.data);
+      
+      if (!Array.isArray(res.data)) {
+        console.error('Expected array of notifications but got:', res.data);
+        setError('Invalid response format from server');
+        setLoading(false);
+        return;
+      }
 
-  const markAsRead = async (id) => {
-    try {
-      await axios.put(`/api/notifications/${id}/read`);
-      setNotifications(notifications.map(n => 
-        n.id === id ? { ...n, read: true } : n
-      ));
+      // Sort notifications by createdAt in descending order (newest first)
+      const sortedNotifications = res.data.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      
+      setNotifications(sortedNotifications);
+      setLoading(false);
+      setError(null);
     } catch (err) {
-      console.error('Failed to mark notification as read:', err);
+      console.error('Failed to fetch notifications:', err.response?.data || err.message);
+      setError('Failed to fetch notifications. Please try again later.');
+      setLoading(false);
     }
   };
 
   const handleClick = async (notification) => {
-    if (!notification.read) {
-      await markAsRead(notification.id);
+    if (!userId) {
+      navigate('/login');
+      return;
     }
-    if (notification.relatedPostId) {
-      // Navigate to comment page for all notifications
-      navigate(`/comments/${notification.relatedPostId}`, {
-        state: { fromNotification: true }
-      });
+
+    try {
+      if (!notification.read) {
+        await axios.put(`/api/notifications/${notification.id}/read`);
+        setNotifications(prevNotifications => 
+          prevNotifications.map(n => 
+            n.id === notification.id ? { ...n, read: true } : n
+          )
+        );
+      }
+
+      if (notification.relatedPostId) {
+        // First verify that the user is still authenticated
+        try {
+          await axios.get(`/api/user/by-identifier?value=${userId}`);
+          // User is authenticated, proceed with navigation
+          navigate('/home', { 
+            state: { 
+              openPost: notification.relatedPostId,
+              fromNotification: true 
+            }
+          });
+        } catch (authErr) {
+          // Authentication failed, redirect to login
+          localStorage.removeItem('nirapod_identifier');
+          navigate('/login');
+        }
+      }
+    } catch (err) {
+      console.error('Error handling notification:', err);
     }
   };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const getNotificationStyle = (notification) => {
     let className = 'notification-item';
     if (!notification.read) className += ' notification-unread';
-
-    // Add type-specific classes
-    if (notification.message.includes('commented on')) {
-      className += ' notification-comment';
-    } else if (notification.message.includes('following')) {
-      className += ' notification-follow';
-    } else if (notification.message.includes('updated')) {
-      className += ' notification-update';
-    } else {
-      className += ' notification-default';
-    }
-
     return className;
   };
 
   const formatTime = (dateString) => {
+    if (!dateString) return '';
+    
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // Return original if invalid
+    
     const now = new Date();
     const diff = now - date;
     
-    // Less than 24 hours ago
+    if (diff < 60000) { // Less than 1 minute
+      return 'Just now';
+    }
+    
     if (diff < 24 * 60 * 60 * 1000) {
       const hours = Math.floor(diff / (60 * 60 * 1000));
       if (hours < 1) {
@@ -87,37 +116,51 @@ function Notifications() {
       return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     }
     
-    // Less than 7 days ago
     if (diff < 7 * 24 * 60 * 60 * 1000) {
       const days = Math.floor(diff / (24 * 60 * 60 * 1000));
       return `${days} day${days !== 1 ? 's' : ''} ago`;
     }
     
-    // Otherwise return the date
     return date.toLocaleDateString();
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return (
+    <div className="notifications-wrapper">
+      <h2 className="page-title">Notifications</h2>
+      <div className="loading">Loading notifications...</div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="notifications-wrapper">
+      <h2 className="page-title">Notifications</h2>
+      <div className="error">{error}</div>
+    </div>
+  );
 
   return (
-    <div className="complaint-list-container">
+    <div className="notifications-wrapper">
       <h2 className="page-title">Notifications</h2>
-      {notifications.length === 0 && (
+      {notifications.length === 0 ? (
         <div className="empty-state">
           No notifications yet
         </div>
-      )}
-      {notifications.map(notification => (
-        <div
-          key={notification.id}
-          className={getNotificationStyle(notification)}
-          onClick={() => handleClick(notification)}
-        >
-          <div className="notification-message">{notification.message}</div>
-          <div className="notification-time">{formatTime(notification.createdAt)}</div>
+      ) : (
+        <div className="notifications-list">
+          {notifications.map(notification => (
+            <div
+              key={notification.id}
+              className={getNotificationStyle(notification)}
+              onClick={() => handleClick(notification)}
+            >
+              <div className="notification-content">
+                <div className="notification-message">{notification.message}</div>
+                <div className="notification-time">{formatTime(notification.createdAt)}</div>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }

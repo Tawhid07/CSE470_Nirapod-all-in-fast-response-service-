@@ -43,11 +43,30 @@
    npm install leaflet-control-geocoder
    ```
 
-4. Start the frontend:
+4. Install Google auth dependencies:
+   ```bash
+   npm install @react-oauth/google
+   ```
+
+5. Start the frontend:
    ```bash
    npm start
    ```
-5. The frontend will run on `http://localhost:3000` by default.
+6. The frontend will run on `http://localhost:3000` by default.
+
+---
+
+## Live Chat Setup
+
+2. **Live Chat (Backend)**
+   - Install the required package:
+     ```bash
+     npm install ws
+     ```
+   - Start the live chat server:
+     ```bash
+     node backend/livechat-server.js
+     ```
 
 ---
 
@@ -58,6 +77,26 @@
    ```bash
    bash db_creation.sh
    ```
+
+---
+
+## Environment Configuration
+
+To set up your environment variables and configuration files:
+
+1. **Backend application.properties**
+   - Copy the example file to create your actual config:
+     ```bash
+     cp backend/src/main/resources/application.properties.example backend/src/main/resources/application.properties
+     ```
+   - Edit `application.properties` and fill in your real database, email, and Google credentials.
+
+2. **Backend .env file**
+   - Copy the example file to create your actual .env:
+     ```bash
+     cp backend/.env.example backend/.env
+     ```
+   - Edit `.env` and fill in your real secrets and environment variables.
 
 ---
 

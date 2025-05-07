@@ -17,6 +17,8 @@ import Investigate from './pages/Investigate';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
 import LiveChat from './pages/LiveChat';
+import AdminHome from './pages/AdminHome';
+import ReportList from './pages/ReportList';
 
 function App() {
   const location = useLocation();
@@ -55,6 +57,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/livechat" element={<LiveChat />} />
+        <Route path="/admin" element={<AdminHome />} />
+        <Route path="/reports" element={<ReportList />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </>

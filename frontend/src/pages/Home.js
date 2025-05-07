@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import ComplaintService from './ComplaintService';
 import axios from 'axios';
 import './Home.css';
@@ -28,6 +29,7 @@ function Home() {
   const userNid = localStorage.getItem('nirapod_identifier');
   const filterBtnRef = useRef(null);
   const filterDropdownRef = useRef(null);
+  const location = useLocation();
 
   // Fetch posts with filters and pagination
   const fetchPosts = useCallback(async (reset = false) => {
@@ -108,6 +110,16 @@ function Home() {
       document.body.style.overflow = 'auto';
     };
   }, [openComment, openPhotos, openReport]);
+
+  useEffect(() => {
+    // Handle navigation from notifications
+    if (location.state?.openPost) {
+      const postId = location.state.openPost;
+      handleOpenComment(postId);
+      // Clear the navigation state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   // Infinite scroll observer
   const lastPostRef = useCallback(node => {
@@ -193,25 +205,92 @@ function Home() {
   };
   const handleAddComment = async (trackingId) => {
     if (!userNid || !commentInput.trim()) return;
-    const complaint = posts.find(p => p.trackingId === trackingId);
-    let commentObj = {};
+    
     try {
-      commentObj = complaint.comment ? JSON.parse(complaint.comment) : {};
-    } catch { commentObj = {}; }
-    // Always use NID as key
-    commentObj[userNid] = commentInput;
-    let status = complaint.status;
-    if (typeof status === 'string') {
-      if (status === 'Solved') status = 2;
-      else if (status === 'In Progress') status = 1;
-      else status = 0;
+      // First get the latest version of the complaint
+      const complaintResponse = await axios.get(`/api/complaint/${trackingId}`);
+      const complaint = complaintResponse.data;
+      console.log('Current complaint data:', complaint);
+      
+      // Parse existing comments
+      let commentObj = {};
+      try {
+        commentObj = complaint.comment ? JSON.parse(complaint.comment) : {};
+      } catch (e) {
+        console.error('Error parsing comments:', e);
+        commentObj = {};
+      }
+      
+      // Add new comment
+      commentObj[userNid] = commentInput;
+      
+      // Update complaint with new comment
+      const updateResponse = await axios.put(`/api/complaint/update/${trackingId}`, {
+        ...complaint,
+        comment: JSON.stringify(commentObj)
+      });
+      console.log('Comment update response:', updateResponse.data);
+
+      // Get followers list
+      const followers = complaint.follow ? 
+        complaint.follow.split(',').filter(f => f.trim() && f !== userNid) : 
+        [];
+      console.log('Followers to notify:', followers);
+      
+      // Create notifications for followers
+      if (followers.length > 0) {
+        // Get commenter name for the notification
+        const commenterResponse = await axios.get(`/api/user/by-identifier?value=${userNid}`);
+        const commenterName = commenterResponse.data.name || 'Someone';
+        
+        for (const followerId of followers) {
+          try {
+            await axios.post('/api/notifications', {
+              userId: followerId,
+              message: `${commenterName} commented on a post you follow: "${complaint.details ? complaint.details.substring(0, 30) + '...' : 'a post'}"`,
+              relatedPostId: trackingId,
+              read: false
+            });
+          } catch (notifErr) {
+            console.error('Error creating notification for follower', followerId, ':', notifErr);
+          }
+        }
+      }
+
+      // Notify the post owner if they're not the commenter and not in followers
+      if (complaint.nid && complaint.nid !== userNid && !followers.includes(complaint.nid)) {
+        try {
+          const commenterResponse = await axios.get(`/api/user/by-identifier?value=${userNid}`);
+          const commenterName = commenterResponse.data.name || 'Someone';
+          
+          await axios.post('/api/notifications', {
+            userId: complaint.nid,
+            message: `${commenterName} commented on your post: "${complaint.details ? complaint.details.substring(0, 30) + '...' : 'your post'}"`,
+            relatedPostId: trackingId,
+            read: false
+          });
+        } catch (notifErr) {
+          console.error('Error creating notification for post owner:', notifErr);
+        }
+      }
+
+      // Update local state
+      setPosts(prevPosts => 
+        prevPosts.map(p => 
+          p.trackingId === trackingId 
+            ? { ...p, comment: JSON.stringify(commentObj) }
+            : p
+        )
+      );
+
+      // Clear input and close comment box
+      setCommentInput('');
+      setOpenComment(null);
+
+    } catch (err) {
+      console.error('Error in handleAddComment:', err);
+      alert('Failed to add comment. Please try again.');
     }
-    await axios.put(`/api/complaint/update/${trackingId}`, {
-      ...complaint,
-      comment: JSON.stringify(commentObj),
-      status
-    });
-    setOpenComment(null);
   };
   const handleOpenPhotos = (trackingId) => {
     setOpenPhotos(trackingId);
@@ -248,7 +327,8 @@ function Home() {
       reportArr = complaint.report ? complaint.report.split(',') : [];
     } catch { reportArr = []; }
     if (!reportArr.includes(userNid)) reportArr.push(userNid);
-    await axios.put(`/api/complaint/update/${trackingId}`, { ...complaint, report: reportArr.join(',') });
+    // Only send the report field for update
+    await axios.put(`/api/complaint/update/${trackingId}`, { report: reportArr.join(',') });
     setOpenReport(null);
   };
 

@@ -8,6 +8,7 @@ function Navbar() {
   const categories = localStorage.getItem('categories');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -33,12 +34,45 @@ function Navbar() {
       }
     };
     fetchUserName();
+
+    // Fetch unread notifications count
+    const fetchUnreadCount = async () => {
+      const identifier = localStorage.getItem('nirapod_identifier');
+      if (!identifier) return;
+      try {
+        const res = await axios.get(`/api/notifications/user/${identifier}/unread-count`);
+        setUnreadCount(res.data);
+      } catch (err) {
+        console.error('Failed to fetch unread count:', err);
+      }
+    };
+
+    fetchUnreadCount();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('nirapod_identifier');
     navigate('/login');
   };
+
+  const NotificationLink = () => (
+    <Link 
+      to="/notifications" 
+      className="navbar-dropdown-item" 
+      onClick={() => setDropdownOpen(false)}
+      style={{ position: 'relative' }}
+    >
+      Notification
+      {unreadCount > 0 && (
+        <span className="navbar-notification-badge">
+          {unreadCount}
+        </span>
+      )}
+    </Link>
+  );
 
   if (categories === 'police') {
     return (
@@ -52,13 +86,13 @@ function Navbar() {
           <a href="/investigate" className="navbar-btn">Investigate</a>
           <div className="navbar-profile-dropdown" ref={dropdownRef}>
             <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
-              Profile <span style={{marginLeft: 6}}>▼</span>
+              Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
                 <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link>
-                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <NotificationLink />
                 <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
               </div>
@@ -84,13 +118,13 @@ function Navbar() {
           {/* <a href=# className="navbar-btn"></a> */}
           <div className="navbar-profile-dropdown" ref={dropdownRef}>
             <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
-              Profile <span style={{marginLeft: 6}}>▼</span>
+              Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
                 {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
-                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <NotificationLink />
                 <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
               </div>
@@ -113,13 +147,13 @@ function Navbar() {
           <a href="/complains" className="navbar-btn">Complains</a>
           <div className="navbar-profile-dropdown" ref={dropdownRef}>
             <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
-              Profile <span style={{marginLeft: 6}}>▼</span>
+              Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
                 {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
-                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <NotificationLink />
                 <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
               </div>
@@ -131,12 +165,6 @@ function Navbar() {
     );
   }
 
-
-
-
-
-
-  
   else if (categories === 'city') {
     return (
       <nav className="navbar-custom">
@@ -148,13 +176,13 @@ function Navbar() {
           <a href="/complains" className="navbar-btn">Complains</a>
           <div className="navbar-profile-dropdown" ref={dropdownRef}>
             <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
-              Profile <span style={{marginLeft: 6}}>▼</span>
+              Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
                 {/* <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link> */}
-                <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+                <NotificationLink />
                 <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
                 <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
               </div>
@@ -165,7 +193,35 @@ function Navbar() {
       </nav>
     );
   }
-  
+
+  if (categories === 'admin') {
+    return (
+      <nav className="navbar-custom">
+        <div className="navbar-logo-box">
+          <img src={logo} alt="Nirapod Logo" className="navbar-logo-img" />
+        </div>
+        <div className="navbar-btn-group">
+          <a href="/admin" className="navbar-btn">Home</a>
+          <a href="/reports" className="navbar-btn">Reports</a>
+          <a href="/investigate" className="navbar-btn">Investigate</a>
+          <div className="navbar-profile-dropdown" ref={dropdownRef}>
+            <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
+              Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
+            </button>
+            {dropdownOpen && (
+              <div className="navbar-dropdown-menu">
+                <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
+                <NotificationLink />
+                <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
+                <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="navbar-welcome-msg">Welcome Admin, {userName}</div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="navbar-custom">
@@ -178,13 +234,13 @@ function Navbar() {
         <Link to="/tracker" className="navbar-btn">Tracker</Link>
         <div className="navbar-profile-dropdown" ref={dropdownRef}>
           <button className="navbar-btn" onClick={() => setDropdownOpen(v => !v)}>
-            Profile <span style={{marginLeft: 6}}>▼</span>
+            Profile {unreadCount > 0 && <span className="navbar-notification-dot"></span>} <span style={{marginLeft: 6}}>▼</span>
           </button>
           {dropdownOpen && (
             <div className="navbar-dropdown-menu">
               <Link to="/profile" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Update Profile</Link>
               <Link to="/my-complains" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Your Complains</Link>
-              <Link to="/notifications" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Notification</Link>
+              <NotificationLink />
               <Link to="/livechat" className="navbar-dropdown-item" onClick={() => setDropdownOpen(false)}>Live Chat</Link>
               <button className="navbar-dropdown-item" onClick={handleLogout}>Logout</button>
             </div>

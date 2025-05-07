@@ -108,6 +108,40 @@ public class ComplaintController {
         return complaints;
     }
 
+    // Fetch all reported complaints
+    @GetMapping("/complaints/reported")
+    public List<ComplaintResponse> getReportedComplaints() {
+        List<Complaint> complaints = repository.findAll();
+        List<ComplaintResponse> responseList = new ArrayList<>();
+        for (Complaint c : complaints) {
+            if (c.getReport() != null && !c.getReport().trim().isEmpty()) {
+                String userName = userRepository.findByNid(c.getNid())
+                        .map(u -> u.getName())
+                        .orElse("");
+                responseList.add(new ComplaintResponse(
+                        c.getTrackingId(),
+                        userName,
+                        c.getUrgency(),
+                        c.getComplainTo(),
+                        c.getDistrict(),
+                        c.getArea(),
+                        c.getTags(),
+                        c.getDetails(),
+                        c.getPhotos(),
+                        c.isPostOnTimeline(),
+                        c.getLocation(),
+                        c.getUpdateNote(),
+                        c.getStatus(),
+                        c.getFollow(),
+                        c.getComment(),
+                        c.getTime(),
+                        c.getReport() // Add report field for frontend
+                ));
+            }
+        }
+        return responseList;
+    }
+
     // Fetch a complaint by ID
     @GetMapping("/complaint/{id}")
     public ResponseEntity<Complaint> getComplaintById(@PathVariable Integer id) {
@@ -158,30 +192,36 @@ public class ComplaintController {
     // Update a complaint's status and update note
     @PutMapping("/complaint/update/{id}")
     public ResponseEntity<Complaint> updateComplaint(@PathVariable Integer id,
-            @RequestBody Complaint updatedComplaint) {
+            @RequestBody Map<String, Object> updates) {
         logger.info("Updating complaint with id: {}", id);
         Optional<Complaint> existingComplaint = repository.findById(id);
         if (existingComplaint.isPresent()) {
             Complaint complaint = existingComplaint.get();
 
-            // Robust status handling: accept both integer and string
-            if (updatedComplaint.getStatus() != null) {
-                complaint.setStatus(updatedComplaint.getStatus());
-            } else if (updatedComplaint.getStatusText() != null) {
-                String statusText = updatedComplaint.getStatusText();
-                if (statusText.equalsIgnoreCase("Solved")) {
-                    complaint.setStatus(2);
-                } else if (statusText.equalsIgnoreCase("In Progress")) {
-                    complaint.setStatus(1);
-                } else {
-                    complaint.setStatus(0); // Default to Unsolved
+            // Partial update: only update fields present in the request
+            if (updates.containsKey("status")) {
+                Object statusObj = updates.get("status");
+                if (statusObj instanceof Number) {
+                    complaint.setStatus(((Number) statusObj).intValue());
+                } else if (statusObj instanceof String) {
+                    String statusText = (String) statusObj;
+                    if (statusText.equalsIgnoreCase("Solved")) {
+                        complaint.setStatus(2);
+                    } else if (statusText.equalsIgnoreCase("In Progress")) {
+                        complaint.setStatus(1);
+                    } else {
+                        complaint.setStatus(0);
+                    }
                 }
             }
-
-            complaint.setUpdateNote(updatedComplaint.getUpdateNote());
-            // Update comment if present
-            if (updatedComplaint.getComment() != null) {
-                complaint.setComment(updatedComplaint.getComment());
+            if (updates.containsKey("updateNote")) {
+                complaint.setUpdateNote((String) updates.get("updateNote"));
+            }
+            if (updates.containsKey("comment")) {
+                complaint.setComment((String) updates.get("comment"));
+            }
+            if (updates.containsKey("report")) {
+                complaint.setReport((String) updates.get("report"));
             }
             Complaint updated = repository.save(complaint);
             logger.info("Complaint with id {} updated successfully", id);
@@ -246,5 +286,15 @@ public class ComplaintController {
         }
         repository.save(complaint);
         return ResponseEntity.ok(Map.of("success", true, "photos", complaint.getPhotos()));
+    }
+
+    // Delete a complaint by ID
+    @DeleteMapping("/complaint/{id}")
+    public ResponseEntity<?> deleteComplaint(@PathVariable Integer id) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.status(404).body("Complaint not found");
+        }
+        repository.deleteById(id);
+        return ResponseEntity.ok().body("Complaint deleted successfully");
     }
 }

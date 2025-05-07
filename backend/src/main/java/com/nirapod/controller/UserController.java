@@ -29,6 +29,15 @@ public class UserController {
 
     @GetMapping("/by-identifier")
     public ResponseEntity<?> getUserByIdentifier(@RequestParam("value") String value) {
+        // Hardcoded admin support
+        if ("admin@gmail.com".equalsIgnoreCase(value) || "admin".equalsIgnoreCase(value)) {
+            Map<String, String> result = new HashMap<>();
+            result.put("nid", "admin");
+            result.put("phone", "admin");
+            result.put("email", "admin@gmail.com");
+            result.put("name", "Admin");
+            return ResponseEntity.ok(result);
+        }
         Optional<User> userOpt = userRepository.findByNid(value);
         if (!userOpt.isPresent()) {
             userOpt = userRepository.findByPhone(value);
