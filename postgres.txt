@@ -56,13 +56,16 @@ npm install
 npm install leaflet
 npm install leaflet-control-geocoder
 npm install @react-oauth/google
-npm install ws
 npm start
 
 # 16. Backend
 cd backend
 mvn clean install
 mvn spring-boot:run
+
+
+##run this in the backend  
+npm install ws
 
 
 ## live chat server
