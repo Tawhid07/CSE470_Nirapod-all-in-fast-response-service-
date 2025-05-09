@@ -69,7 +69,7 @@ npm install ws
 
 
 ## live chat server
-node backend/livechat-server.js
+node livechat-server.js
 # 16. Press Q to exit from the psql prompt
 
 project name 
